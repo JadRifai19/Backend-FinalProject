@@ -25,16 +25,17 @@ export const getAdminById = async (req, res) => {
 };
 
 // Create a new admin
-export const createAdmin = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const admin = new Admin({ username, email, password });
-    await admin.save();
-    res.status(201).json({ message: 'Admin created successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to create admin', error });
+export async function createAdmin(req, res, next) {
+    const model = new Admin(req.body);
+    await model
+      .save()
+      .then((data) => {
+        return res.status(201).send({ status: 201, data });
+      })
+      .catch((err) => {
+        next(err);
+      });
   }
-};
 
 // Update an admin
 export const updateAdmin = async (req, res) => {

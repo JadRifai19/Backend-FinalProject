@@ -25,16 +25,18 @@ export const getInstructorById = async (req, res) => {
 };
 
 // Create a new instructor
-export const createInstructor = async (req, res) => {
-  try {
-    const { instructorName } = req.body;
-    const instructor = new Instructor({ instructorName });
-    await instructor.save();
-    res.status(201).json({ message: 'Instructor created successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to create instructor', error });
-  }
-};
+export async function createInstructor(req, res, next) {
+  const model = new Instructor(req.body);
+  await model
+    .save()
+    .then((data) => {
+      return res.status(201).send({ status: 201, data });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 
 // Update an instructor
 export const updateInstructor = async (req, res) => {

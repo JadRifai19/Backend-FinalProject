@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const { Schema, model } = mongoose;
-
+import UserTraining from './usertrainingmodels.js';
 
 const UserSchema = new Schema({
   username: { type: String, required: true },
@@ -10,5 +10,6 @@ const UserSchema = new Schema({
   lastName: { type: String, required: true },
 });
 
-const User = mongoose.model("user", UserSchema);
+
+const User = model("User", UserSchema);
 export default User;

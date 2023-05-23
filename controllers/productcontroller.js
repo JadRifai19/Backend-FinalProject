@@ -1,4 +1,5 @@
 import Product from '../models/productmodels.js';
+import userModel from '../models/usermodels.js';
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -27,14 +28,27 @@ export const getProductById = async (req, res) => {
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { productName, description, price, imageUrl } = req.body;
-    const product = new Product({ productName, description, price, imageUrl });
+    // console.log('Creating a product');
+    console.log(req.body);
+    const data = req.body;
+    const user = await userModel.findById(req.body.user_Id);
+    if (!user)
+    return res.status(404).json({ message: "User not found" });
+    
+    const product = new Product({
+      productName: req.body.productName,
+      description:req.body.description,
+      price:req.body.price,
+      image:req.file.path,
+      user_Id:req.body.user_Id,
+    });
     await product.save();
-    res.status(201).json({ message: 'Product created successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to create product', error });
+    res.status(200).json({ message: "New Product created successfully", product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-};
+}
+
 
 // Update a product
 export const updateProduct = async (req, res) => {
