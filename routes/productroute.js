@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct,
 } from '../controllers/productcontroller.js';
+import imageHandler from '../middleware/image.js';
 
 const router = express.Router();
 

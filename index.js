@@ -9,7 +9,7 @@ import Shopping from './routes/shoppingroute.js';
 import Training from './routes/trainingroute.js';
 import User from './routes/userroute.js';
 import Usertraining from './routes/usertrainingroute.js';
-
+import cors from "cors"
 dotenv.config();
 connectDB();
 
@@ -17,10 +17,11 @@ const PORT = process.env.PORT || 6000;
 const app = express();
 
 // Set up multer middleware
-const upload = multer({ dest: "uploads/" });
+ const upload = multer({ dest: "uploads/" });
 
-app.use(upload.single("image"));
+ app.use(upload.single("image"));
 app.use(express.json());
+app.use(cors())
 
 // Define your routes and middleware here
 app.use("/admin", Admin);
@@ -30,10 +31,10 @@ app.use("/shopping", Shopping);
 app.use("/training", Training);
 app.use("/User", User);
 app.use("/Usertraining", Usertraining);
-
-app.post("/upload", (req, res) => {
-  // Handle the file upload here
-});
+app.use("/uploads",express.static('./uploads'));
+ app.post("/upload", (req, res) => {
+   // Handle the file upload here
+ });
 
 app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

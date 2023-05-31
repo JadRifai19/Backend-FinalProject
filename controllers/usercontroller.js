@@ -13,20 +13,71 @@ export const getAllUsers = async (req, res) => {
 // Create a new user
 export const createUser = async (req, res) => {
   try {
-    // const { username, password, email, firstName, lastName } = req.body;
-    const user = new User({
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName
+    const { username, email, password  } = req.body;
+    console.log(username)
+    if (!username || !email || !password ) {
+      return res.status(400).json({
+        message: "All inputs is required",
+      });
+    }
+
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(409).json({
+        message: "Mail exists",
+      });
+    }
+
+    const newUser = new User({
+      username: username,
+      email: email.toLowerCase(),
+      password: password,
     });
-    await user.save();
-    res.status(201).json({ message: 'User created successfully' });
+    await newUser
+      .save()
+      .then((response) => {
+        res.status(201).json({
+          success: true,
+          response,
+          message: "User Created Successfully",
+        });
+      })
+      .catch((err) => {
+        res.status(400).json({ success: false, err : err.message});
+      });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: err,
+    });
+  }
+}
+
+export const login = async (req, res, next) => {
+  try {
+    // Check if email and password are provided
+    const { email } = req.body;
+
+    // Check if email exists in database
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Check if password is correct
+    const isValidPassword = await user.isValidPassword(req.body.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    const { password, ...otherDetails } = user._doc;
+
+    res.json({ ...otherDetails });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to create user', error: error.message });
+    next(error);
   }
 };
+
 
 //get user by id
 export const getUserById = async (req, res) => {
